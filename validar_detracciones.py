@@ -51,8 +51,8 @@ def extraer_info_pdf(pdf_path: str) -> dict:
             if match_proveedor:
                 resultado["nombre_proveedor"] = match_proveedor.group(1).strip()
             
-            # Buscar Número de Comprobante - patrón más flexible para capturar FE01, FC02, FF05, F253, etc.
-            patron_comprobante = r"N[úu]mero\s+de\s+Comprobante\s+([A-Z]{1,4}[0-9]{1,3}\s*-\s*[0-9]+)"
+            # Buscar Número de Comprobante - patrón flexible para capturar FE01, FC02, FF05, F253, F0Z1, F0D1, etc.
+            patron_comprobante = r"N.mero\s+de\s+Comprobante\s+([A-Z][A-Z0-9]{1,3}\s*-\s*[0-9]+)"
             match_comprobante = re.search(patron_comprobante, texto_completo, re.IGNORECASE)
             if match_comprobante:
                 resultado["numero_comprobante"] = match_comprobante.group(1).strip()
@@ -233,9 +233,9 @@ def validar_archivo(nombre_archivo: str, info_pdf: dict) -> dict:
     # Ejemplo: 1900259454_OMNI LOGISTICS (PERU) E001-00009926 DETRACCION
     
     # Buscar el patrón del número de comprobante en el nombre del archivo
-    # Patrón más flexible: 1-4 letras seguidas de 1-3 dígitos, guion, y más dígitos
-    # Ejemplos: E001, FE01, FC02, FF05, F253, FS02
-    patron_comprobante_archivo = r'([A-Z]{1,4}[0-9]{1,3}-[0-9]+)'
+    # Patrón flexible: letra inicial + 1-3 alfanuméricos, guion, y más dígitos
+    # Ejemplos: E001, FE01, FC02, FF05, F253, FS02, F0Z1, F0D1
+    patron_comprobante_archivo = r'([A-Z][A-Z0-9]{1,3}-[0-9]+)'
     match_comprobante = re.search(patron_comprobante_archivo, nombre_sin_extension, re.IGNORECASE)
     
     if match_comprobante:
