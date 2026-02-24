@@ -2,6 +2,10 @@
 
 Aplicación de escritorio para validar archivos PDF de constancias de depósito de detracciones emitidas por SUNAT.
 
+<div align="center">
+	<img width="678" height="476" alt="detracciones_validator" src="https://github.com/user-attachments/assets/d7ca0a75-853f-491c-9aa5-77a14d173791" />
+</div>
+
 ## Descripción
 
 Esta herramienta permite validar automáticamente que los nombres de los archivos PDF de detracciones coincidan con la información contenida dentro de cada documento:
