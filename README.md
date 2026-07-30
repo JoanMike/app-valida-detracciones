@@ -16,17 +16,18 @@ Esta herramienta permite validar automáticamente que los nombres de los archivo
 ## Características
 
 - ✅ Interfaz gráfica intuitiva
-- ✅ Procesamiento por lotes de múltiples archivos PDF
+- ✅ Procesamiento por lotes de múltiples archivos PDF en segundo plano (la interfaz no se congela)
 - ✅ Barra de progreso en tiempo real
 - ✅ Resultados visuales con colores (verde=correcto, rojo=error)
 - ✅ Comparación flexible de nombres (ignora acentos, signos, sufijos empresariales)
 - ✅ Menú contextual con clic derecho para abrir archivo o ubicación
-- ✅ Doble clic para abrir el PDF directamente
-- ✅ Soporte para equivalencias especiales personalizables
+- ✅ Doble clic o tecla Enter para abrir el PDF directamente
+- ✅ Soporte para equivalencias especiales personalizables (`equivalencias.json`)
+- ✅ Registro de eventos y errores en `validador.log`
 
 ## Requisitos
 
-- Python 3.8 o superior
+- Python 3.10 o superior
 - Windows 10/11
 
 ## Instalación
@@ -45,7 +46,7 @@ venv\Scripts\activate
 
 3. Instalar dependencias:
 ```bash
-pip install pdfplumber
+pip install -r requirements.txt
 ```
 
 ## Uso
@@ -62,9 +63,10 @@ python validar_detracciones.py
 4. Revisar los resultados:
    - **Verde**: El archivo pasó la validación
    - **Rojo**: El archivo tiene errores de coincidencia
+   - En las columnas de validación: **✓** válido, **✗** no coincide, **—** el dato no se pudo extraer del PDF
 
 5. Opciones adicionales:
-   - **Doble clic**: Abre el PDF con el programa predeterminado
+   - **Doble clic o Enter**: Abre el PDF con el programa predeterminado
    - **Clic derecho → Abrir archivo**: Abre el PDF
    - **Clic derecho → Abrir ubicación**: Abre el explorador en la ubicación del archivo
 
@@ -97,14 +99,30 @@ La aplicación realiza comparaciones inteligentes:
 | MERCADO PAGO PERU | MERCADOPAGO PERU S.R.L. | ✓ Válido |
 | TIENDAS POR DPTO RIPLEY | TIENDAS POR DEPARTAMENTO RIPLEY S.A. | ✓ Válido |
 
+**Nota:** cuando la comparación es por palabras significativas, se exige que la mayoría (≥60%) de las palabras largas del nombre del archivo aparezcan en el PDF. Una sola palabra genérica en común (ej. "SERVICIOS") ya no es suficiente para considerar válido un archivo.
+
 ## Equivalencias especiales
 
-Para casos donde la validación automática no es posible (nombres muy abreviados), se pueden agregar equivalencias especiales en el diccionario `EQUIVALENCIAS_ESPECIALES` del código:
+Para casos donde la validación automática no es posible (nombres muy abreviados), se pueden agregar equivalencias especiales en el archivo `equivalencias.json` (junto al script), sin tocar el código:
 
-```python
-EQUIVALENCIAS_ESPECIALES = {
-    "CONSULT. INTEG. DE MKT Y COMUNIC. NOVACOM": "CONSULTORA INTEGRAL DE MARKETING Y",
+```json
+{
+    "CONSULT. INTEG. DE MKT Y COMUNIC. NOVACOM": "CONSULTORA INTEGRAL DE MARKETING Y"
 }
+```
+
+- **Clave**: nombre en el archivo (se normaliza en mayúsculas)
+- **Valor**: texto que debe aparecer en el PDF para considerarlo válido
+
+Si el archivo no existe o es inválido, la aplicación funciona normalmente sin equivalencias (se registra en `validador.log`).
+
+## Pruebas
+
+La lógica de validación (normalización y comparación de nombres y comprobantes) tiene pruebas unitarias con pytest:
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest tests/
 ```
 
 ## Estructura del proyecto
@@ -112,21 +130,26 @@ EQUIVALENCIAS_ESPECIALES = {
 ```
 appValidaDetracciones/
 ├── validar_detracciones.py    # Aplicación principal
-├── README.md                   # Este archivo
-├── .gitignore                  # Archivos ignorados por Git
-├── venv/                       # Entorno virtual (no incluido en Git)
-└── example/                    # Carpeta de ejemplos
-    └── *.pdf                   # Archivos PDF de ejemplo
+├── equivalencias.json         # Equivalencias especiales de nombres (editable)
+├── requirements.txt           # Dependencias de producción
+├── requirements-dev.txt       # Dependencias de desarrollo (tests)
+├── tests/                     # Pruebas unitarias
+├── README.md                  # Este archivo
+├── LICENSE                    # Términos de uso
+├── .gitignore                 # Archivos ignorados por Git
+├── validador.log              # Registro de eventos (generado, no versionado)
+└── venv/                      # Entorno virtual (no incluido en Git)
 ```
 
 ## Dependencias
 
 - [pdfplumber](https://github.com/jsvine/pdfplumber) - Extracción de texto de PDFs
 - tkinter - Interfaz gráfica (incluido en Python)
+- [pytest](https://docs.pytest.org/) - Pruebas unitarias (solo desarrollo)
 
 ## Licencia
 
-Uso interno - Todos los derechos reservados.
+Uso interno - Todos los derechos reservados. Ver archivo `LICENSE`.
 
 ## Autor
 
