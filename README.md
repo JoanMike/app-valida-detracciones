@@ -1,109 +1,69 @@
-# Validador de Detracciones SUNAT
+# SUNAT Detractions Validator
 
-Aplicación de escritorio para validar archivos PDF de constancias de depósito de detracciones emitidas por SUNAT.
+![License](https://img.shields.io/badge/license-PolyForm%20NC%201.0.0-blue)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)
+![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows&logoColor=white)
+
+> Desktop application that validates SUNAT-issued detraction deposit certificate PDFs against their file names.
+
+## Overview
+
+This tool automatically checks that the file names of detraction PDFs match the information contained inside each document:
+
+1. **Supplier name**: validates that the supplier name in the file name matches the "Nombre/Razón Social del Proveedor" field in the PDF.
+2. **Voucher number**: validates that the voucher number in the file name matches the "Número de Comprobante" field in the PDF.
 
 <div align="center">
 	<img width="678" height="476" alt="detracciones_validator" src="https://github.com/user-attachments/assets/d7ca0a75-853f-491c-9aa5-77a14d173791" />
 </div>
 
-## Descripción
+## Features
 
-Esta herramienta permite validar automáticamente que los nombres de los archivos PDF de detracciones coincidan con la información contenida dentro de cada documento:
+- Intuitive graphical interface.
+- Batch processing of multiple PDF files in the background (the UI never freezes).
+- Real-time progress bar.
+- Visual results with colors (green = OK, red = error).
+- Flexible name comparison (ignores accents, punctuation, and company suffixes).
+- Right-click context menu to open the file or its location.
+- Double-click or Enter key to open the PDF directly.
+- Customizable special equivalences (`equivalencias.json`).
+- Event and error logging in `validador.log`.
 
-1. **Nombre del Proveedor**: Valida que el nombre del proveedor en el archivo coincida con el campo "Nombre/Razón Social del Proveedor" del PDF.
-2. **Número de Comprobante**: Valida que el número de comprobante en el nombre del archivo coincida con el campo "Número de Comprobante" del PDF.
+## Tech Stack
 
-## Características
+- **Python 3.10+** with [pdfplumber](https://github.com/jsvine/pdfplumber) for PDF text extraction and `tkinter` for the GUI (bundled with Python).
+- Tests with [pytest](https://docs.pytest.org/) (development only).
 
-- ✅ Interfaz gráfica intuitiva
-- ✅ Procesamiento por lotes de múltiples archivos PDF en segundo plano (la interfaz no se congela)
-- ✅ Barra de progreso en tiempo real
-- ✅ Resultados visuales con colores (verde=correcto, rojo=error)
-- ✅ Comparación flexible de nombres (ignora acentos, signos, sufijos empresariales)
-- ✅ Menú contextual con clic derecho para abrir archivo o ubicación
-- ✅ Doble clic o tecla Enter para abrir el PDF directamente
-- ✅ Soporte para equivalencias especiales personalizables (`equivalencias.json`)
-- ✅ Registro de eventos y errores en `validador.log`
+## Requirements
 
-## Requisitos
+- Python 3.10 or higher.
+- Windows 10/11.
 
-- Python 3.10 o superior
-- Windows 10/11
+## Installation
 
-## Instalación
+1. Clone or download the repository:
 
-1. Clonar o descargar el repositorio:
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/JoanMike/appValidaDetracciones.git
 cd appValidaDetracciones
 ```
 
-2. Crear un entorno virtual (recomendado):
+2. Create a virtual environment (recommended):
+
 ```bash
 python -m venv venv
 venv\Scripts\activate
 ```
 
-3. Instalar dependencias:
+3. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-## Uso
+## Configuration
 
-1. Ejecutar la aplicación:
-```bash
-python validar_detracciones.py
-```
-
-2. Hacer clic en **"Seleccionar Carpeta"** y elegir la carpeta que contiene los PDFs de detracciones.
-
-3. Hacer clic en **"Validar Archivos"** para iniciar la validación.
-
-4. Revisar los resultados:
-   - **Verde**: El archivo pasó la validación
-   - **Rojo**: El archivo tiene errores de coincidencia
-   - En las columnas de validación: **✓** válido, **✗** no coincide, **—** el dato no se pudo extraer del PDF
-
-5. Opciones adicionales:
-   - **Doble clic o Enter**: Abre el PDF con el programa predeterminado
-   - **Clic derecho → Abrir archivo**: Abre el PDF
-   - **Clic derecho → Abrir ubicación**: Abre el explorador en la ubicación del archivo
-
-## Formato de nombres de archivo esperado
-
-Los archivos PDF deben seguir este formato:
-```
-{RUC}_{NOMBRE_PROVEEDOR} {NUMERO_COMPROBANTE} DETRACCION.pdf
-```
-
-**Ejemplo:**
-```
-1900259454_OMNI LOGISTICS (PERU) E001-00009926 DETRACCION.pdf
-```
-
-Donde:
-- `1900259454` = Número de referencia/RUC
-- `OMNI LOGISTICS (PERU)` = Nombre del proveedor
-- `E001-00009926` = Número de comprobante
-- `DETRACCION` = Sufijo identificador
-
-## Validaciones flexibles
-
-La aplicación realiza comparaciones inteligentes:
-
-| Nombre en archivo | Nombre en PDF | Resultado |
-|-------------------|---------------|-----------|
-| KUEHNE NAGEL | KUEHNE + NAGEL S.A. | ✓ Válido |
-| ESTUDIO MUNIZ | ESTUDIO MUÑIZ S.R.L. | ✓ Válido |
-| MERCADO PAGO PERU | MERCADOPAGO PERU S.R.L. | ✓ Válido |
-| TIENDAS POR DPTO RIPLEY | TIENDAS POR DEPARTAMENTO RIPLEY S.A. | ✓ Válido |
-
-**Nota:** cuando la comparación es por palabras significativas, se exige que la mayoría (≥60%) de las palabras largas del nombre del archivo aparezcan en el PDF. Una sola palabra genérica en común (ej. "SERVICIOS") ya no es suficiente para considerar válido un archivo.
-
-## Equivalencias especiales
-
-Para casos donde la validación automática no es posible (nombres muy abreviados), se pueden agregar equivalencias especiales en el archivo `equivalencias.json` (junto al script), sin tocar el código:
+For cases where automatic validation is not possible (heavily abbreviated names), special equivalences can be added to the `equivalencias.json` file (next to the script), without touching the code:
 
 ```json
 {
@@ -111,46 +71,99 @@ Para casos donde la validación automática no es posible (nombres muy abreviado
 }
 ```
 
-- **Clave**: nombre en el archivo (se normaliza en mayúsculas)
-- **Valor**: texto que debe aparecer en el PDF para considerarlo válido
+- **Key**: name in the file name (normalized to uppercase).
+- **Value**: text that must appear in the PDF to consider the file valid.
 
-Si el archivo no existe o es inválido, la aplicación funciona normalmente sin equivalencias (se registra en `validador.log`).
+If the file does not exist or is invalid, the application works normally without equivalences (this is logged in `validador.log`).
 
-## Pruebas
+## Usage
 
-La lógica de validación (normalización y comparación de nombres y comprobantes) tiene pruebas unitarias con pytest:
+1. Run the application:
+
+```bash
+python validar_detracciones.py
+```
+
+2. Click **"Seleccionar Carpeta"** and choose the folder containing the detraction PDFs.
+
+3. Click **"Validar Archivos"** to start the validation.
+
+4. Review the results:
+   - **Green**: the file passed validation.
+   - **Red**: the file has mismatches.
+   - In the validation columns: **✓** valid, **✗** mismatch, **—** the data could not be extracted from the PDF.
+
+5. Additional options:
+   - **Double-click or Enter**: opens the PDF with the default program.
+   - **Right-click → Abrir archivo**: opens the PDF.
+   - **Right-click → Abrir ubicación**: opens File Explorer at the file's location.
+
+### Expected file name format
+
+PDF files must follow this format:
+
+```text
+{RUC}_{NOMBRE_PROVEEDOR} {NUMERO_COMPROBANTE} DETRACCION.pdf
+```
+
+**Example:**
+
+```text
+1900259454_OMNI LOGISTICS (PERU) E001-00009926 DETRACCION.pdf
+```
+
+Where:
+
+- `1900259454` = reference number / RUC
+- `OMNI LOGISTICS (PERU)` = supplier name
+- `E001-00009926` = voucher number
+- `DETRACCION` = identifier suffix
+
+### Flexible validations
+
+The application performs smart comparisons:
+
+| Name in file | Name in PDF | Result |
+|--------------|-------------|--------|
+| KUEHNE NAGEL | KUEHNE + NAGEL S.A. | ✓ Valid |
+| ESTUDIO MUNIZ | ESTUDIO MUÑIZ S.R.L. | ✓ Valid |
+| MERCADO PAGO PERU | MERCADOPAGO PERU S.R.L. | ✓ Valid |
+| TIENDAS POR DPTO RIPLEY | TIENDAS POR DEPARTAMENTO RIPLEY S.A. | ✓ Valid |
+
+When comparison is by significant words, the majority (≥60%) of the long words in the file name must appear in the PDF. A single generic word in common (e.g. "SERVICIOS") is no longer enough to consider a file valid.
+
+### Running the tests
+
+The validation logic (normalization and comparison of names and vouchers) has unit tests with pytest:
 
 ```bash
 pip install -r requirements-dev.txt
 python -m pytest tests/
 ```
 
-## Estructura del proyecto
+## Project Structure
 
-```
+```text
 appValidaDetracciones/
-├── validar_detracciones.py    # Aplicación principal
-├── equivalencias.json         # Equivalencias especiales de nombres (editable)
-├── requirements.txt           # Dependencias de producción
-├── requirements-dev.txt       # Dependencias de desarrollo (tests)
-├── tests/                     # Pruebas unitarias
-├── README.md                  # Este archivo
-├── LICENSE                    # Términos de uso
-├── .gitignore                 # Archivos ignorados por Git
-├── validador.log              # Registro de eventos (generado, no versionado)
-└── venv/                      # Entorno virtual (no incluido en Git)
+├── validar_detracciones.py    # Main application
+├── equivalencias.json         # Special name equivalences (editable)
+├── requirements.txt           # Production dependencies
+├── requirements-dev.txt       # Development dependencies (tests)
+├── tests/                     # Unit tests
+├── README.md                  # This file
+├── LICENSE                    # Terms of use
+├── .gitignore                 # Files ignored by Git
+├── validador.log              # Event log (generated, not versioned)
+└── venv/                      # Virtual environment (not included in Git)
 ```
 
-## Dependencias
+## License
 
-- [pdfplumber](https://github.com/jsvine/pdfplumber) - Extracción de texto de PDFs
-- tkinter - Interfaz gráfica (incluido en Python)
-- [pytest](https://docs.pytest.org/) - Pruebas unitarias (solo desarrollo)
+Distributed under the **PolyForm Noncommercial License 1.0.0** — free for
+noncommercial use only. See [LICENSE](LICENSE) for the full license text.
 
-## Licencia
+Copyright (c) 2026 Jose Miguel Maldonado Garcia
 
-Uso interno - Todos los derechos reservados. Ver archivo `LICENSE`.
+## Author
 
-## Autor
-
-Desarrollado para la validación de documentos de detracciones SUNAT.
+**Jose Miguel Maldonado Garcia** — [@JoanMike](https://github.com/JoanMike)
